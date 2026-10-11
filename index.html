@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8f6f0">
   <meta name="description" content="Turn spreadsheet rows into a ready-to-import VCF contact file.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;650;700;750;800&display=swap" rel="stylesheet">
   <title>Contact VCF Maker</title>
   <style>
     :root {
@@ -25,7 +28,7 @@
         radial-gradient(ellipse at 5% 7%, rgba(225, 231, 211, .35), transparent 27rem),
         var(--bg);
       color: var(--ink);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       -webkit-font-smoothing: antialiased;
     }
     .page { width: min(1440px, calc(100% - 64px)); margin: 0 auto; padding: 32px 0 24px; }
@@ -64,7 +67,7 @@
     }
     textarea:focus, input:focus { border-color: #7da797; box-shadow: 0 0 0 3px rgba(45,102,87,.09); }
     .paste-meta { position: absolute; bottom: 14px; left: 16px; right: 12px; display: flex; justify-content: space-between; align-items: center; pointer-events: none; color: #92988e; font-size: 12px; }
-    .clear-btn { pointer-events: auto; border: 1px solid #b88749; background: transparent; color: #4b806e; border-radius: 0; font: 650 13px inherit; padding: 7px 8px; cursor: pointer; }
+    .clear-btn { pointer-events: auto; border: 1px solid #b88749; background: transparent; color: #4b806e; border-radius: 0; font: inherit; font-size: 13px; font-weight: 650; padding: 7px 8px; cursor: pointer; }
     .help { display: flex; gap: 10px; color: #859087; font-size: 13px; line-height: 1.55; margin: 13px 0 25px; }
     .help svg { flex: 0 0 auto; width: 17px; height: 17px; margin-top: 1px; }
     .rule { border: 0; border-top: 1px solid #eee9df; margin: 27px 0 24px; }
@@ -78,7 +81,11 @@
     .check-row input { accent-color: var(--green); width: 20px; height: 20px; margin: 0; flex: 0 0 auto; }
     .check-row small { display: block; color: #92988e; font-size: 12px; font-weight: 400; margin-top: 3px; }
     .count-pill { color: #3d705f; background: #eaf0e6; padding: 7px 12px; border-radius: 99px; font-size: 12px; font-weight: 750; white-space: nowrap; }
-    .contacts { display: grid; gap: 10px; }
+    .contacts { display: grid; gap: 10px; max-height: 360px; overflow-y: auto; overscroll-behavior: contain; padding: 0 6px 0 0; scrollbar-width: thin; scrollbar-color: #b7c5b7 #f1f0e9; }
+    .contacts::-webkit-scrollbar { width: 8px; }
+    .contacts::-webkit-scrollbar-track { background: #f1f0e9; border-radius: 8px; }
+    .contacts::-webkit-scrollbar-thumb { background: #b7c5b7; border-radius: 8px; }
+    .contacts::-webkit-scrollbar-thumb:hover { background: #8da795; }
     .contact { display: flex; align-items: center; gap: 15px; min-width: 0; border: 1px solid #ece7dc; border-radius: 13px; background: #fffefa; padding: 12px 14px; }
     .avatar { display: grid; place-items: center; width: 41px; height: 41px; flex: 0 0 auto; border-radius: 12px; background: #e9efe4; color: #557e6e; font-size: 11px; font-weight: 750; }
     .contact-main { min-width: 0; flex: 1; }
@@ -91,7 +98,7 @@
     .download {
       width: 100%; min-height: 58px; display: flex; justify-content: center; align-items: center; gap: 12px;
       border: 0; border-radius: 12px; background: var(--green); color: white; padding: 16px;
-      font: 750 15px inherit; cursor: pointer; box-shadow: 0 5px 12px rgba(45,102,87,.12); transition: background .18s, transform .18s;
+      font: inherit; font-size: 15px; font-weight: 750; cursor: pointer; box-shadow: 0 5px 12px rgba(45,102,87,.12); transition: background .18s, transform .18s;
     }
     .download:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); }
     .download:disabled { opacity: .48; cursor: not-allowed; box-shadow: none; }
@@ -102,6 +109,18 @@
     .empty { padding: 28px 18px; border: 1px dashed #deded1; border-radius: 13px; color: #8a9187; font-size: 13px; line-height: 1.6; text-align: center; }
     .message { color: #9a513b; font-size: 13px; line-height: 1.5; margin-top: 12px; }
     .message:empty { display: none; }
+    /* Compact personal-use layout */
+    header { margin-bottom: 24px; }
+    .brand-sub, .privacy, .intro, .step, .hint, .help, .rule, .field-note, .status, .footnote, .privacy-footer { display: none !important; }
+    .page { width: min(1280px, calc(100% - 32px)); padding-top: 24px; }
+    .panel { padding: 22px; }
+    .panel-heading { margin-bottom: 16px; }
+    .fields { margin-top: 8px; }
+    .field { margin-bottom: 12px; }
+    .check-row { margin-top: 12px; }
+    .workspace { gap: 18px; }
+    textarea { min-height: 220px; }
+    .empty { padding: 20px 12px; }
     @media (max-width: 900px) {
       .page { width: min(100% - 36px, 720px); padding-top: 22px; }
       header { margin-bottom: 52px; }
@@ -129,6 +148,112 @@
       .contact { gap: 10px; padding: 10px; }
       .contact-name { font-size: 13px; }
     }
+
+    /* Refined compact personal-use styling */
+    :root {
+      --bg: #f4f6f2;
+      --paper: #ffffff;
+      --ink: #1e332c;
+      --muted: #77857d;
+      --green: #276b55;
+      --green-dark: #1e5744;
+      --line: #e1e8e1;
+      --soft: #edf4ee;
+      --shadow: 0 8px 28px rgba(31, 57, 43, .055);
+    }
+    body {
+      background: linear-gradient(145deg, #f7f8f4 0%, #eef3ed 100%);
+      min-height: 100vh;
+    }
+    .page { width: min(1320px, calc(100% - 40px)); padding: 24px 0 30px; }
+    header { margin-bottom: 22px; }
+    .brand { gap: 11px; }
+    .brand-icon { width: 40px; height: 40px; border-radius: 12px; box-shadow: 0 3px 8px rgba(39,107,85,.16); }
+    .brand-icon svg { width: 21px; height: 21px; }
+    .brand-name { font-size: 15px; letter-spacing: -.2px; }
+    .workspace { grid-template-columns: minmax(0, 1.02fr) minmax(0, .98fr); gap: 20px; align-items: stretch; }
+    .panel {
+      background: rgba(255,255,255,.94);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+    .panel-heading { margin-bottom: 15px; }
+    h2 { font-size: 15px; letter-spacing: -.15px; }
+    .count-pill { background: #edf5ee; color: #28674f; padding: 6px 10px; font-size: 11px; }
+    textarea {
+      min-height: 210px;
+      border: 1px solid #dce5dc;
+      border-radius: 12px;
+      background: #fbfcfa;
+      padding: 16px 15px 44px;
+      font-size: 13px;
+      line-height: 1.75;
+    }
+    textarea:focus, input:focus { border-color: #79a992; box-shadow: 0 0 0 3px rgba(39,107,85,.10); }
+    .paste-meta { bottom: 10px; left: 12px; right: 10px; color: #7d8a81; font-size: 11px; }
+    .clear-btn {
+      border: 1px solid #dce5dc; border-radius: 7px; background: #fff;
+      color: #526c5d; padding: 5px 9px; font-size: 11px; font-weight: 650;
+      transition: background .15s, border-color .15s;
+    }
+    .clear-btn:hover { background: #f0f5f0; border-color: #c4d6c8; }
+    .fields { grid-template-columns: minmax(0, 1fr) 118px; gap: 12px; margin-top: 4px; }
+    .field { margin-bottom: 13px; }
+    label.field-label { color: #4e6759; font-size: 12px; margin-bottom: 7px; }
+    .text-input { height: 43px; border-color: #dce5dc; border-radius: 9px; padding: 0 12px; background: #fff; font-size: 13px; }
+    .check-row { gap: 10px; margin-top: 13px; color: #355b48; font-size: 12px; line-height: 1.4; }
+    .check-row input { width: 17px; height: 17px; margin-top: 1px; }
+    .check-row small { color: #849087; font-size: 11px; line-height: 1.45; margin-top: 3px; }
+    .contacts {
+      gap: 8px; max-height: 390px; min-height: 140px; overflow-y: auto;
+      padding: 2px 7px 2px 0; scrollbar-gutter: stable;
+      scrollbar-width: thin; scrollbar-color: #aebfb1 #f1f4f0;
+    }
+    .contacts::-webkit-scrollbar { width: 7px; }
+    .contacts::-webkit-scrollbar-track { background: #f1f4f0; border-radius: 10px; }
+    .contacts::-webkit-scrollbar-thumb { background: #b8c9bb; border: 1px solid #f1f4f0; border-radius: 10px; }
+    .contacts::-webkit-scrollbar-thumb:hover { background: #8ea995; }
+    .contact { gap: 12px; padding: 10px 12px; border-color: #e6ece5; border-radius: 11px; transition: border-color .15s, background .15s; }
+    .contact:hover { background: #fcfdfb; border-color: #d3e2d5; }
+    .avatar { width: 36px; height: 36px; border-radius: 10px; background: #edf4eb; color: #3f765e; font-size: 10px; }
+    .contact-name { font-size: 13px; line-height: 1.4; }
+    .contact-phone { margin-top: 3px; font-size: 12px; color: #7b8980; }
+    .contact-number { color: #89978c; font-size: 11px; }
+    .download {
+      min-height: 49px; border-radius: 10px; padding: 13px 16px; gap: 9px;
+      background: var(--green); box-shadow: 0 4px 10px rgba(39,107,85,.15);
+      font-size: 13px; transition: background .16s, transform .16s, box-shadow .16s;
+    }
+    .download:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); box-shadow: 0 6px 14px rgba(39,107,85,.19); }
+    .download:focus-visible, .clear-btn:focus-visible { outline: 3px solid rgba(39,107,85,.25); outline-offset: 2px; }
+    .download:disabled { opacity: .42; }
+    .empty { border-color: #dce5dc; background: #fbfcfa; padding: 24px 14px; font-size: 12px; }
+    .message { font-size: 12px; }
+    @media (max-width: 900px) {
+      .page { width: min(calc(100% - 28px), 700px); padding-top: 18px; }
+      .workspace { grid-template-columns: 1fr; gap: 14px; }
+      header { margin-bottom: 18px; }
+      .panel { padding: 18px; }
+      .contacts { max-height: 340px; }
+    }
+    @media (max-width: 520px) {
+      .page { width: calc(100% - 20px); padding-top: 14px; }
+      .panel { padding: 15px 13px; border-radius: 14px; }
+      .brand-icon { width: 36px; height: 36px; border-radius: 10px; }
+      .brand-name { font-size: 14px; }
+      .fields { grid-template-columns: minmax(0, 1fr) 92px; gap: 9px; }
+      .text-input { height: 41px; padding: 0 10px; font-size: 12px; }
+      textarea { min-height: 190px; padding: 13px 12px 42px; font-size: 12px; }
+      .contacts { max-height: 300px; min-height: 100px; }
+      .contact { padding: 9px; gap: 9px; }
+      .avatar { width: 32px; height: 32px; border-radius: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
   </style>
 </head>
 <body>
@@ -140,10 +265,8 @@
         </div>
         <div>
           <div class="brand-name">Contact VCF Maker</div>
-          <div class="brand-sub">A little order for your address book</div>
         </div>
       </div>
-      <div class="privacy"><span class="privacy-dot"></span><span>Your data stays on this device</span></div>
     </header>
 
     <section class="intro">
@@ -155,13 +278,10 @@
     <section class="workspace" aria-label="Contact VCF generator">
       <div class="panel">
         <div class="panel-heading">
-          <div class="heading-left"><span class="step">01</span><h2>Paste your list</h2></div>
-          <span class="hint">Name first, phone second</span>
+          <div class="heading-left"><h2>Contacts</h2></div>
         </div>
         <div class="paste-wrap">
-          <textarea id="contactInput" spellcheck="false" aria-label="Paste names and phone numbers">Jane Doe	(415) 555-0184
-Marcus Lee	(510) 555-0127
-Priya Shah	(650) 555-0191</textarea>
+          <textarea id="contactInput" spellcheck="false" aria-label="Paste names and phone numbers"></textarea>
           <div class="paste-meta"><span id="rowCount">3 rows</span><button class="clear-btn" type="button" id="clearBtn">Clear list</button></div>
         </div>
         <div class="help">
@@ -171,7 +291,7 @@ Priya Shah	(650) 555-0191</textarea>
 
         <hr class="rule">
         <div class="panel-heading">
-          <div class="heading-left"><span class="step">02</span><h2>Set the contact label</h2></div>
+          <div class="heading-left"><h2>Naming</h2></div>
         </div>
 
         <div class="fields">
@@ -204,7 +324,7 @@ Priya Shah	(650) 555-0191</textarea>
 
       <div class="panel">
         <div class="panel-heading">
-          <div class="heading-left"><span class="step">03</span><h2>Review your contacts</h2></div>
+          <div class="heading-left"><h2>Preview</h2></div>
           <span class="count-pill" id="contactCount">3 contacts</span>
         </div>
         <div class="contacts" id="contactPreview" aria-live="polite"></div>
