@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f6f0">
+  <meta name="description" content="Turn spreadsheet rows into a ready-to-import VCF contact file.">
+  <title>Contact VCF Maker</title>
+  <style>
+    :root {
+      --bg: #f8f6f0;
+      --paper: #fffefa;
+      --ink: #203c35;
+      --muted: #899087;
+      --green: #2d6657;
+      --green-dark: #245447;
+      --line: #e7e2d7;
+      --soft: #eaf0e6;
+      --shadow: 0 16px 44px rgba(43, 57, 44, .045);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 5% 7%, rgba(225, 231, 211, .35), transparent 27rem),
+        var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page { width: min(1440px, calc(100% - 64px)); margin: 0 auto; padding: 32px 0 24px; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 70px; }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-icon {
+      width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center;
+      background: var(--green); color: white; box-shadow: 0 4px 10px rgba(45,102,87,.13);
+    }
+    .brand-icon svg { width: 23px; height: 23px; }
+    .brand-name { font-weight: 750; font-size: 16px; letter-spacing: -.3px; }
+    .brand-sub { color: #819087; font-size: 13px; margin-top: 5px; letter-spacing: .2px; }
+    .privacy { display: flex; align-items: center; gap: 9px; color: #75867b; font-size: 13px; }
+    .privacy-dot { width: 8px; height: 8px; border-radius: 50%; background: #7aa17a; box-shadow: 0 0 0 4px #e8eee3; }
+    .intro { max-width: 760px; margin-bottom: 40px; }
+    .eyebrow { color: #527a6c; font-size: 12px; letter-spacing: 2px; font-weight: 750; text-transform: uppercase; margin: 0 0 15px; }
+    h1 {
+      font-family: Georgia, "Times New Roman", serif; font-size: clamp(46px, 5.2vw, 76px);
+      line-height: .99; letter-spacing: -3.2px; font-weight: 600; margin: 0; max-width: 680px;
+    }
+    .intro p { color: #718078; font-size: 17px; line-height: 1.8; max-width: 710px; margin: 22px 0 0; }
+    .workspace { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 26px; align-items: start; }
+    .panel { background: rgba(255,254,250,.88); border: 1px solid var(--line); border-radius: 22px; padding: 28px; box-shadow: var(--shadow); min-width: 0; }
+    .panel-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 25px; }
+    .heading-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .step { flex: 0 0 auto; width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid #d8e1d4; border-radius: 50%; color: #427566; font: 700 12px Georgia, serif; }
+    h2 { margin: 0; font-size: 16px; font-weight: 750; letter-spacing: -.25px; }
+    .hint { color: var(--muted); font-size: 13px; white-space: nowrap; }
+    textarea, input { font: inherit; color: var(--ink); }
+    .paste-wrap { position: relative; }
+    textarea {
+      display: block; width: 100%; min-height: 258px; resize: vertical; border: 1px solid #e0ddd2;
+      border-radius: 13px; background: #fcfbf7; padding: 20px 18px 47px; outline: none;
+      font: 15px/1.85 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      transition: border-color .18s, box-shadow .18s;
+    }
+    textarea:focus, input:focus { border-color: #7da797; box-shadow: 0 0 0 3px rgba(45,102,87,.09); }
+    .paste-meta { position: absolute; bottom: 14px; left: 16px; right: 12px; display: flex; justify-content: space-between; align-items: center; pointer-events: none; color: #92988e; font-size: 12px; }
+    .clear-btn { pointer-events: auto; border: 1px solid #b88749; background: transparent; color: #4b806e; border-radius: 0; font: 650 13px inherit; padding: 7px 8px; cursor: pointer; }
+    .help { display: flex; gap: 10px; color: #859087; font-size: 13px; line-height: 1.55; margin: 13px 0 25px; }
+    .help svg { flex: 0 0 auto; width: 17px; height: 17px; margin-top: 1px; }
+    .rule { border: 0; border-top: 1px solid #eee9df; margin: 27px 0 24px; }
+    .fields { display: grid; grid-template-columns: minmax(0, 1fr) 158px; gap: 14px; }
+    .field { min-width: 0; margin-bottom: 19px; }
+    .field.full { grid-column: 1 / -1; }
+    label.field-label { display: block; color: #5b7065; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+    .text-input { width: 100%; height: 50px; border: 1px solid #e0ddd2; background: #fffefa; border-radius: 11px; padding: 0 14px; outline: none; transition: border-color .18s, box-shadow .18s; }
+    .field-note { color: #92988e; font-size: 12px; margin-top: 8px; line-height: 1.45; }
+    .check-row { display: flex; align-items: flex-start; gap: 12px; margin: 17px 0 0; color: #47675a; font-size: 13px; font-weight: 650; cursor: pointer; line-height: 1.5; }
+    .check-row input { accent-color: var(--green); width: 20px; height: 20px; margin: 0; flex: 0 0 auto; }
+    .check-row small { display: block; color: #92988e; font-size: 12px; font-weight: 400; margin-top: 3px; }
+    .count-pill { color: #3d705f; background: #eaf0e6; padding: 7px 12px; border-radius: 99px; font-size: 12px; font-weight: 750; white-space: nowrap; }
+    .contacts { display: grid; gap: 10px; }
+    .contact { display: flex; align-items: center; gap: 15px; min-width: 0; border: 1px solid #ece7dc; border-radius: 13px; background: #fffefa; padding: 12px 14px; }
+    .avatar { display: grid; place-items: center; width: 41px; height: 41px; flex: 0 0 auto; border-radius: 12px; background: #e9efe4; color: #557e6e; font-size: 11px; font-weight: 750; }
+    .contact-main { min-width: 0; flex: 1; }
+    .contact-name { font-size: 14px; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
+    .contact-phone { color: #899087; font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; margin-top: 5px; overflow-wrap: anywhere; }
+    .contact-number { color: #9b9e91; font: 12px Georgia, serif; padding-left: 4px; }
+    .status { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: #92988e; font-size: 13px; margin: 27px 0 24px; }
+    .status-right { display: flex; align-items: center; gap: 7px; text-align: right; }
+    .status-right svg { width: 16px; height: 16px; color: #819487; }
+    .download {
+      width: 100%; min-height: 58px; display: flex; justify-content: center; align-items: center; gap: 12px;
+      border: 0; border-radius: 12px; background: var(--green); color: white; padding: 16px;
+      font: 750 15px inherit; cursor: pointer; box-shadow: 0 5px 12px rgba(45,102,87,.12); transition: background .18s, transform .18s;
+    }
+    .download:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); }
+    .download:disabled { opacity: .48; cursor: not-allowed; box-shadow: none; }
+    .download svg { width: 19px; height: 19px; }
+    .footnote { color: #999b91; font-size: 12px; text-align: center; margin-top: 12px; line-height: 1.5; }
+    .privacy-footer { display: flex; align-items: center; justify-content: center; gap: 9px; color: #92988e; font-size: 13px; padding: 29px 0 0; }
+    .privacy-footer svg { width: 17px; height: 17px; color: #7d9b8c; }
+    .empty { padding: 28px 18px; border: 1px dashed #deded1; border-radius: 13px; color: #8a9187; font-size: 13px; line-height: 1.6; text-align: center; }
+    .message { color: #9a513b; font-size: 13px; line-height: 1.5; margin-top: 12px; }
+    .message:empty { display: none; }
+    @media (max-width: 900px) {
+      .page { width: min(100% - 36px, 720px); padding-top: 22px; }
+      header { margin-bottom: 52px; }
+      .workspace { grid-template-columns: 1fr; }
+      .intro { margin-bottom: 30px; }
+      h1 { letter-spacing: -2px; }
+    }
+    @media (max-width: 520px) {
+      .page { width: calc(100% - 24px); padding-top: 18px; }
+      header { align-items: flex-start; margin-bottom: 44px; }
+      .brand { gap: 10px; }
+      .brand-icon { width: 40px; height: 40px; }
+      .brand-name { font-size: 14px; }
+      .brand-sub { font-size: 11px; }
+      .privacy { font-size: 11px; max-width: 110px; line-height: 1.4; }
+      .privacy-dot { flex: 0 0 auto; }
+      .eyebrow { font-size: 10px; letter-spacing: 1.5px; }
+      h1 { font-size: clamp(43px, 12vw, 58px); }
+      .intro p { font-size: 15px; line-height: 1.7; }
+      .panel { padding: 18px 15px; border-radius: 17px; }
+      .panel-heading { align-items: flex-start; }
+      .hint { font-size: 11px; white-space: normal; text-align: right; }
+      .fields { grid-template-columns: minmax(0, 1fr) 100px; gap: 10px; }
+      textarea { min-height: 230px; padding-left: 13px; font-size: 13px; }
+      .contact { gap: 10px; padding: 10px; }
+      .contact-name { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3.5h6v3H9zM8.5 11h7M8.5 15h7"/></svg>
+        </div>
+        <div>
+          <div class="brand-name">Contact VCF Maker</div>
+          <div class="brand-sub">A little order for your address book</div>
+        </div>
+      </div>
+      <div class="privacy"><span class="privacy-dot"></span><span>Your data stays on this device</span></div>
+    </header>
+
+    <section class="intro">
+      <div class="eyebrow">Contacts, in good order</div>
+      <h1>From rows to<br>ready-to-save.</h1>
+      <p>Turn a spreadsheet list into one tidy contact file. Paste names and numbers, choose a label, and you're ready to add them to your phone.</p>
+    </section>
+
+    <section class="workspace" aria-label="Contact VCF generator">
+      <div class="panel">
+        <div class="panel-heading">
+          <div class="heading-left"><span class="step">01</span><h2>Paste your list</h2></div>
+          <span class="hint">Name first, phone second</span>
+        </div>
+        <div class="paste-wrap">
+          <textarea id="contactInput" spellcheck="false" aria-label="Paste names and phone numbers">Jane Doe	(415) 555-0184
+Marcus Lee	(510) 555-0127
+Priya Shah	(650) 555-0191</textarea>
+          <div class="paste-meta"><span id="rowCount">3 rows</span><button class="clear-btn" type="button" id="clearBtn">Clear list</button></div>
+        </div>
+        <div class="help">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 9h6M9 13h6M9 17h3"/></svg>
+          <span>Copy two columns from your sheet and paste here. Tabs or commas both work; leave out the header row.</span>
+        </div>
+
+        <hr class="rule">
+        <div class="panel-heading">
+          <div class="heading-left"><span class="step">02</span><h2>Set the contact label</h2></div>
+        </div>
+
+        <div class="fields">
+          <div class="field">
+            <label class="field-label" for="groupLabel">Group label</label>
+            <input class="text-input" id="groupLabel" type="text" value="Jan Donors" placeholder="e.g. Jan Donors">
+            <div class="field-note">Used at the start of every contact name</div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="startAt">Start at</label>
+            <input class="text-input" id="startAt" type="number" min="1" step="1" value="1">
+            <div class="field-note">Sequence number</div>
+          </div>
+          <div class="field full">
+            <label class="field-label" for="filename">Download filename</label>
+            <input class="text-input" id="filename" type="text" placeholder="Jan Donors">
+            <div class="field-note">Leave blank to use the group label. The .vcf extension is added automatically.</div>
+          </div>
+        </div>
+
+        <label class="check-row">
+          <input id="addSequence" type="checkbox" checked>
+          <span>Add sequence number to contact names<small>Adds 01, 02, and so on after the group label.</small></span>
+        </label>
+        <label class="check-row">
+          <input id="keepOriginal" type="checkbox" checked>
+          <span>Keep each person’s original name<small>Adds it after the label, like “Jan Donors 01 Jane Doe”.</small></span>
+        </label>
+      </div>
+
+      <div class="panel">
+        <div class="panel-heading">
+          <div class="heading-left"><span class="step">03</span><h2>Review your contacts</h2></div>
+          <span class="count-pill" id="contactCount">3 contacts</span>
+        </div>
+        <div class="contacts" id="contactPreview" aria-live="polite"></div>
+        <div class="status">
+          <span id="statusText">Names and numbers are ready</span>
+          <span class="status-right">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg>
+            <span id="statusShort">Ready</span>
+          </span>
+        </div>
+        <button class="download" id="downloadBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 20h14"/></svg>
+          <span id="downloadText">Download 3 contacts as .vcf</span>
+        </button>
+        <div class="footnote">One file · Works with iPhone, Android, and most address books</div>
+        <div class="message" id="message" role="status"></div>
+      </div>
+    </section>
+
+    <footer class="privacy-footer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg>
+      <span>Everything happens right here in your browser</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3ZM19 16l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3Z"/></svg>
+    </footer>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const input = $("contactInput");
+    const groupLabel = $("groupLabel");
+    const startAt = $("startAt");
+    const filename = $("filename");
+    const addSequence = $("addSequence");
+    const keepOriginal = $("keepOriginal");
+    const preview = $("contactPreview");
+    const message = $("message");
+
+    function parseRows(raw) {
+      return raw.split(/\r?\n/).map(line => line.trim()).filter(Boolean).map(line => {
+        // Spreadsheet paste is tab-separated. Also support comma and semicolon separated rows.
+        let parts;
+        if (line.includes("\t")) {
+          parts = line.split("\t");
+        } else if (line.includes(";")) {
+          parts = line.split(";");
+        } else if (line.includes(",")) {
+          // If the first field looks like a phone number, comma could be part of a name.
+          parts = line.split(",");
+        } else {
+          // For whitespace-separated rows, treat the last phone-like token(s) as the number.
+          const match = line.match(/^(.*?)\s+((?:\+|00)?[\d(][\d\s().-]*\d)\s*$/);
+          parts = match ? [match[1], match[2]] : [line, ""];
+        }
+        const name = (parts.shift() || "").trim().replace(/^["']|["']$/g, "");
+        const phone = parts.join(" ").trim().replace(/^["']|["']$/g, "");
+        return { name, phone };
+      }).filter(row => row.name && row.phone);
+    }
+
+    function contactDisplayName(contact, index) {
+      const sequence = String(Number(startAt.value || 1) + index).padStart(2, "0");
+      const pieces = [];
+      if (groupLabel.value.trim()) pieces.push(groupLabel.value.trim());
+      if (addSequence.checked) pieces.push(sequence);
+      if (keepOriginal.checked) pieces.push(contact.name);
+      return pieces.join(" ") || contact.name;
+    }
+
+    function initials(name) {
+      const words = name.trim().split(/\s+/).filter(Boolean);
+      return (words.length > 1 ? words[0][0] + words[words.length - 1][0] : (words[0] || "?").slice(0, 2)).toUpperCase();
+    }
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[char]);
+    }
+
+    function render() {
+      const rows = parseRows(input.value);
+      $("rowCount").textContent = `${input.value.split(/\r?\n/).filter(line => line.trim()).length} ${input.value.split(/\r?\n/).filter(line => line.trim()).length === 1 ? "row" : "rows"}`;
+      $("contactCount").textContent = `${rows.length} ${rows.length === 1 ? "contact" : "contacts"}`;
+      $("downloadText").textContent = `Download ${rows.length} ${rows.length === 1 ? "contact" : "contacts"} as .vcf`;
+      $("downloadBtn").disabled = rows.length === 0;
+      $("statusText").textContent = rows.length ? "Names and numbers are ready" : "Paste at least one valid name and number";
+      $("statusShort").textContent = rows.length ? "Ready" : "Waiting";
+      message.textContent = "";
+      if (!rows.length) {
+        preview.innerHTML = '<div class="empty">Your contacts will appear here.<br>Paste names and phone numbers to get started.</div>';
+        return;
+      }
+      const shown = rows.slice(0, 100);
+      preview.innerHTML = shown.map((contact, index) => `
+        <div class="contact">
+          <div class="avatar">${escapeHtml(initials(contact.name))}</div>
+          <div class="contact-main">
+            <div class="contact-name">${escapeHtml(contactDisplayName(contact, index))}</div>
+            <div class="contact-phone">${escapeHtml(contact.phone)}</div>
+          </div>
+          <div class="contact-number">${String(Number(startAt.value || 1) + index).padStart(2, "0")}</div>
+        </div>`).join("") + (rows.length > shown.length ? `<div class="empty">Showing the first 100 of ${rows.length} contacts. All contacts will be exported.</div>` : "");
+    }
+
+    function vcardEscape(value) {
+      return value.replace(/\\/g, "\\\\").replace(/\r?\n/g, "\\n").replace(/;/g, "\\;").replace(/,/g, "\\,");
+    }
+
+    function downloadVcf() {
+      const rows = parseRows(input.value);
+      if (!rows.length) return;
+      const cards = rows.map((contact, index) => {
+        const displayName = contactDisplayName(contact, index);
+        const phone = contact.phone.replace(/[\r\n]/g, "").trim();
+        return [
+          "BEGIN:VCARD",
+          "VERSION:3.0",
+          `FN:${vcardEscape(displayName)}`,
+          `N:${vcardEscape(displayName)};;;;`,
+          `TEL;TYPE=CELL:${vcardEscape(phone)}`,
+          "END:VCARD"
+        ].join("\r\n");
+      }).join("\r\n");
+      const blob = new Blob([cards + "\r\n"], { type: "text/vcard;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const safeBase = (filename.value.trim() || groupLabel.value.trim() || "contacts")
+        .replace(/\.vcf$/i, "").replace(/[\\/:*?"<>|]/g, "-").trim() || "contacts";
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${safeBase}.vcf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      message.style.color = "#47745d";
+      message.textContent = `Created ${rows.length} contact${rows.length === 1 ? "" : "s"} in ${safeBase}.vcf`;
+    }
+
+    input.addEventListener("input", render);
+    [groupLabel, startAt, addSequence, keepOriginal].forEach(el => el.addEventListener("input", render));
+    $("clearBtn").addEventListener("click", () => { input.value = ""; render(); input.focus(); });
+    $("downloadBtn").addEventListener("click", downloadVcf);
+    render();
+  </script>
+</body>
+</html>
