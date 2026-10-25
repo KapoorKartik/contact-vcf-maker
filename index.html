@@ -108,8 +108,9 @@
     .brand-icon svg { width: 21px; height: 21px; }
     .brand-name { font-weight: 750; font-size: 15px; letter-spacing: -.2px; }
     .brand-sub { color: var(--faint); font-size: 12px; margin-top: 2px; }
-    .privacy { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
-    .privacy-dot { width: 7px; height: 7px; border-radius: 50%; background: #7aa17a; box-shadow: 0 0 0 4px var(--soft); }
+    .credit { color: var(--muted); font-size: 13px; text-align: right; }
+    .credit strong { color: var(--ink); font-weight: 650; }
+    .credit .heart { color: var(--heart); display: inline-block; animation: beat 2.4s ease-in-out infinite; }
 
     .workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
     .panel {
@@ -118,24 +119,22 @@
     }
     .panel-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
     h2 { margin: 0; font-size: 15px; font-weight: 750; letter-spacing: -.15px; }
-    .section-gap { margin-top: 24px; }
+    .section-gap { margin-top: 20px; }
 
     textarea, input { font: inherit; color: var(--ink); }
     .paste-wrap { position: relative; }
     textarea {
       display: block; width: 100%; min-height: 220px; resize: vertical; outline: none;
       border: 1px solid var(--field); border-radius: 12px; background: var(--well);
-      padding: 15px 15px 44px; font: 13px/1.75 var(--mono); tab-size: 18; white-space: pre; overflow-x: auto;
+      padding: 14px 15px; font: 13px/1.75 var(--mono); tab-size: 18; white-space: pre; overflow-x: auto;
+      scrollbar-width: thin; scrollbar-color: var(--scroll-thumb) transparent;
       transition: border-color .18s, box-shadow .18s;
     }
     textarea::placeholder, .text-input::placeholder { color: var(--faint); opacity: .8; }
     textarea:focus, .text-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--focus); }
-    .paste-meta {
-      position: absolute; bottom: 10px; left: 12px; right: 10px; display: flex; justify-content: space-between;
-      align-items: center; pointer-events: none; color: var(--muted); font-size: 11px;
-    }
+    .paste-meta { margin-left: auto; display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 11px; white-space: nowrap; }
     .clear-btn {
-      pointer-events: auto; cursor: pointer; font: inherit; font-size: 11px; font-weight: 650;
+      cursor: pointer; font: inherit; font-size: 11px; font-weight: 650;
       border: 1px solid var(--field); border-radius: 7px; background: var(--input-bg); color: var(--label); padding: 5px 9px;
       transition: background .15s, border-color .15s;
     }
@@ -144,9 +143,8 @@
     .col-chip { background: var(--soft); color: var(--soft-ink); border-radius: 6px; padding: 3px 8px; font-weight: 650; font-size: 11px; }
     .col-sep { color: var(--faint); }
 
-    .fields { display: grid; grid-template-columns: minmax(0, 1fr) 118px; gap: 12px; }
+    .fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 96px; gap: 12px; }
     .field { min-width: 0; }
-    .field.full { grid-column: 1 / -1; }
     label.field-label { display: block; color: var(--label); font-size: 12px; font-weight: 700; margin-bottom: 7px; }
     .text-input {
       width: 100%; height: 43px; outline: none; font-size: 13px;
@@ -154,10 +152,9 @@
       transition: border-color .18s, box-shadow .18s;
     }
     .optional { color: var(--faint); font-weight: 500; margin-left: 4px; }
-    .name-example { margin-top: 16px; padding: 10px 12px; border-radius: 9px; background: var(--soft); color: var(--muted); font-size: 12px; }
-    .name-example strong { color: var(--ink); font-weight: 700; margin-left: 2px; }
-    .field-note { color: var(--faint); font-size: 11px; margin-top: 6px; line-height: 1.45; }
-    .field-note code { font-family: var(--mono); font-size: 11px; color: var(--label); }
+    .name-example { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-top: 14px; padding: 9px 12px; border-radius: 9px; background: var(--soft); color: var(--muted); font-size: 12px; }
+    .name-example strong { color: var(--ink); font-weight: 700; margin-left: 4px; overflow-wrap: anywhere; }
+    .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
     .check-row { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; color: var(--check-ink); font-size: 12px; font-weight: 650; line-height: 1.4; cursor: pointer; }
     .check-row input { accent-color: var(--green); width: 17px; height: 17px; margin: 1px 0 0; flex: 0 0 auto; }
     .check-row small { display: block; color: var(--muted); font-size: 11px; font-weight: 400; line-height: 1.45; margin-top: 3px; }
@@ -169,27 +166,47 @@
     .notice svg { width: 15px; height: 15px; flex: 0 0 auto; margin-top: 1px; }
 
     .groups {
-      display: grid; gap: 12px; max-height: 520px; min-height: 140px; overflow-y: auto; overscroll-behavior: contain;
+      display: flex; flex-direction: column; gap: 8px; max-height: 520px; min-height: 140px; overflow-y: auto; overscroll-behavior: contain;
       padding: 2px 7px 2px 0; scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: var(--scroll-thumb) var(--scroll-track);
     }
     .groups::-webkit-scrollbar { width: 7px; }
     .groups::-webkit-scrollbar-track { background: var(--scroll-track); border-radius: 10px; }
     .groups::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 10px; }
     .group {
-      --hue: 155;
+      --hue: 155; flex: 0 0 auto;
       border: 1px solid var(--line); border-left: 3px solid hsl(var(--hue) var(--tint-stripe));
       border-radius: 13px; background: var(--well); overflow: hidden;
     }
     .group.unassigned { border: 1px dashed var(--warn-line); border-left: 3px solid var(--warn-line); background: var(--warn-bg); }
-    .group-head { display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 12px; border-bottom: 1px solid var(--divider); background: var(--input-bg); }
+    .group-tools { display: flex; gap: 8px; margin-bottom: 10px; }
+    .group-tools[hidden], .search-input[hidden] { display: none; }
+    .search-input { flex: 1; height: 36px; }
+    .tool-btn {
+      margin-left: auto; flex: 0 0 auto; height: 36px; padding: 0 12px; cursor: pointer;
+      border: 1px solid var(--field); border-radius: 9px; background: var(--input-bg); color: var(--label);
+      font: inherit; font-size: 12px; font-weight: 700;
+    }
+    .tool-btn:hover { background: var(--soft); border-color: var(--field-hover); }
+    .group-head { display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 4px; background: var(--input-bg); }
+    .group.open .group-head { border-bottom: 1px solid var(--divider); }
+    .group:not(.open) .group-body { display: none; }
+    .group-toggle {
+      flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 4px 6px; cursor: pointer;
+      border: 0; border-radius: 8px; background: transparent; color: inherit; font: inherit; text-align: left;
+    }
+    .group-toggle:hover { background: var(--soft); }
+    .chev { width: 14px; height: 14px; flex: 0 0 auto; color: var(--faint); transition: transform .16s; }
+    .group.open .chev { transform: rotate(90deg); }
+    .group-count { margin-left: 6px; color: var(--muted); font-size: 12px; font-weight: 600; }
+    .group-body .group-file { padding: 7px 12px; border-bottom: 1px solid var(--divider); margin: 0; }
     .group.unassigned .group-head { background: transparent; border-bottom-color: var(--warn-line); }
     .group-avatar {
-      width: 34px; height: 34px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 10px;
+      width: 30px; height: 30px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 10px;
       background: hsl(var(--hue) var(--tint-bg)); color: hsl(var(--hue) var(--tint-ink)); font-size: 11px; font-weight: 800;
     }
     .group.unassigned .group-avatar { background: var(--warn-line); color: var(--warn); }
-    .group-info { flex: 1; min-width: 0; }
-    .group-name { font-size: 13px; font-weight: 750; overflow-wrap: anywhere; }
+    .group-info { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .group-name { font-size: 13px; font-weight: 750; }
     .group-file { color: var(--faint); font: 11px/1.4 var(--mono); margin-top: 2px; overflow-wrap: anywhere; }
     .group-btn {
       flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 40px; min-height: 36px; cursor: pointer;
@@ -220,16 +237,22 @@
     .download:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); }
     .download:disabled { opacity: .42; cursor: not-allowed; box-shadow: none; }
     .download svg { width: 18px; height: 18px; }
-    .download:focus-visible, .clear-btn:focus-visible, .group-btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .download:focus-visible, .clear-btn:focus-visible, .group-btn:focus-visible, .group-toggle:focus-visible, .tool-btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
     .message { color: var(--soft-ink); font-size: 12px; line-height: 1.5; margin-top: 10px; text-align: center; }
     .message:empty { display: none; }
 
-    footer { margin-top: 34px; text-align: center; color: var(--muted); font-size: 13px; }
-    footer .heart { color: var(--heart); display: inline-block; animation: beat 2.4s ease-in-out infinite; }
-    footer strong { color: var(--ink); font-weight: 650; }
-    footer .sub { margin-top: 6px; color: var(--faint); font-size: 11px; }
     @keyframes beat { 0%, 70%, 100% { transform: scale(1); } 80% { transform: scale(1.18); } }
 
+    @media (min-width: 901px) and (min-height: 600px) {
+      .page { height: 100vh; height: 100dvh; display: flex; flex-direction: column; padding: 18px 0; }
+      header { flex: 0 0 auto; margin-bottom: 14px; }
+      .workspace { flex: 1; min-height: 0; align-items: stretch; }
+      .panel { display: flex; flex-direction: column; min-height: 0; }
+      .panel:first-child { overflow-y: auto; }
+      .paste-wrap { flex: 1; min-height: 150px; display: flex; flex-direction: column; }
+      textarea { flex: 1; min-height: 0; resize: none; }
+      .groups { flex: 1; min-height: 0; max-height: none; }
+    }
     @media (max-width: 900px) {
       .page { width: min(calc(100% - 28px), 700px); padding-top: 18px; }
       .workspace { grid-template-columns: 1fr; gap: 14px; }
@@ -246,15 +269,18 @@
     }
     @media (max-width: 520px) {
       .page { width: calc(100% - 20px); padding-top: 14px; }
-      .privacy { display: none; }
+      header { flex-wrap: wrap; gap: 8px; }
+      .credit { flex-basis: 100%; text-align: left; font-size: 12px; padding-left: 47px; }
       .panel { padding: 15px 13px; border-radius: 14px; }
       .download-bar { margin: 14px -13px -15px; padding: 10px 13px calc(10px + env(safe-area-inset-bottom)); border-radius: 0 0 14px 14px; }
       .brand-icon { width: 36px; height: 36px; border-radius: 10px; }
       .brand-name { font-size: 14px; }
       .fields { grid-template-columns: minmax(0, 1fr) 92px; gap: 9px; }
+      .file-field { grid-column: 1 / -1; order: 3; }
+      .checks { grid-template-columns: 1fr; }
       .text-input { height: 44px; padding: 0 10px; font-size: 16px; }
-      textarea { min-height: 190px; padding: 13px 12px 42px; font-size: 12px; tab-size: 10; }
-      .col-tip { flex-basis: 100%; }
+      textarea { min-height: 190px; padding: 12px; font-size: 12px; tab-size: 10; }
+      .col-tip { display: none; }
       .group-btn { min-width: 44px; min-height: 40px; }
       .group-btn .btn-label { display: none; }
       .group-btn.saved .btn-label { display: inline; }
@@ -277,7 +303,7 @@
           <div class="brand-sub">One contact file per assignee</div>
         </div>
       </div>
-      <div class="privacy"><span class="privacy-dot"></span>Runs entirely in your browser</div>
+      <div class="credit">Made with <span class="heart" aria-label="love">♥</span> by <strong>Karunābdhi Srigovind Das</strong></div>
     </header>
 
     <section class="workspace" aria-label="Contact VCF generator">
@@ -286,13 +312,13 @@
         <div class="paste-wrap">
           <textarea id="contactInput" spellcheck="false" wrap="off" aria-label="Paste name, number and assignee columns"
             placeholder="Paste from your sheet, e.g.&#10;Jane Doe	98765 43210	Ram Das&#10;John Smith	91234 56789	Shyam Das&#10;	99887 76655	Ram Das"></textarea>
-          <div class="paste-meta"><span id="rowCount">0 rows</span><button class="clear-btn" type="button" id="clearBtn">Clear list</button></div>
         </div>
         <div class="columns">
           <span class="col-chip">Name</span><span class="col-sep">→</span>
           <span class="col-chip">Number</span><span class="col-sep">→</span>
           <span class="col-chip">Assignee</span>
           <span class="col-tip">· copy 3 columns straight from the sheet</span>
+          <span class="paste-meta"><span id="rowCount">0 rows</span><button class="clear-btn" type="button" id="clearBtn">Clear list</button></span>
         </div>
 
         <div class="panel-heading section-gap"><h2>Naming</h2></div>
@@ -301,26 +327,30 @@
             <label class="field-label" for="groupLabel">Name prefix <span class="optional">optional</span></label>
             <input class="text-input" id="groupLabel" type="text" placeholder="e.g. Batch 1">
           </div>
+          <div class="field file-field">
+            <label class="field-label" for="filename">File name <span class="optional">optional</span></label>
+            <input class="text-input" id="filename" type="text" placeholder="Uses the prefix">
+          </div>
           <div class="field">
             <label class="field-label" for="startAt">Start at</label>
             <input class="text-input" id="startAt" type="number" min="1" step="1" value="1">
           </div>
-          <div class="field full">
-            <label class="field-label" for="filename">File name</label>
-            <input class="text-input" id="filename" type="text" placeholder="Uses the prefix, or “Contacts”">
-            <div class="field-note">Each file is saved as <code><span id="filePattern">Contacts</span> - [assignee].vcf</code></div>
-          </div>
         </div>
 
-        <label class="check-row">
-          <input id="addSequence" type="checkbox" checked>
-          <span>Add sequence number to contact names<small>01, 02… restarting for each assignee.</small></span>
-        </label>
-        <label class="check-row">
-          <input id="keepOriginal" type="checkbox" checked>
-          <span>Keep each person’s original name<small>Missing names become “NA”.</small></span>
-        </label>
-        <div class="name-example">Contacts will be saved as <strong id="nameExample">01 Jane Doe</strong></div>
+        <div class="checks">
+          <label class="check-row">
+            <input id="addSequence" type="checkbox" checked>
+            <span>Add sequence number<small>01, 02… restarting for each assignee.</small></span>
+          </label>
+          <label class="check-row">
+            <input id="keepOriginal" type="checkbox" checked>
+            <span>Keep original name<small>Missing names become “NA”.</small></span>
+          </label>
+        </div>
+        <div class="name-example">
+          <span>Contact <strong id="nameExample">01 Jane Doe</strong></span>
+          <span>File <strong><span id="filePattern">Contacts</span> - [assignee].vcf</strong></span>
+        </div>
       </div>
 
       <div class="panel">
@@ -329,6 +359,10 @@
           <span class="count-pill" id="contactCount">0 contacts</span>
         </div>
         <div class="notices" id="notices" aria-live="polite"></div>
+        <div class="group-tools" id="groupTools" hidden>
+          <input class="text-input search-input" id="groupSearch" type="search" placeholder="Find assignee…" aria-label="Find assignee" hidden>
+          <button class="tool-btn" id="toggleAllBtn" type="button">Expand all</button>
+        </div>
         <div class="groups" id="groupPreview"></div>
         <div class="download-bar">
         <button class="download" id="downloadAllBtn" type="button">
@@ -340,10 +374,6 @@
       </div>
     </section>
 
-    <footer>
-      <div>Made with <span class="heart" aria-label="love">♥</span> by <strong>Karunābdhi Srigovind Das</strong></div>
-      <div class="sub">Works with iPhone, Android and most address books</div>
-    </footer>
   </main>
 
   <script>
@@ -357,6 +387,8 @@
     const preview = $("groupPreview");
     const notices = $("notices");
     const message = $("message");
+    const groupSearch = $("groupSearch");
+    const toggleAllBtn = $("toggleAllBtn");
 
     const NAME_PLACEHOLDER = "NA";
     const UNASSIGNED = "Unassigned";
@@ -392,7 +424,7 @@
       const groups = new Map();
       for (const row of rows) {
         const key = row.assignee.toLowerCase();
-        if (!groups.has(key)) groups.set(key, { assignee: row.assignee || UNASSIGNED, unassigned: !row.assignee, contacts: [] });
+        if (!groups.has(key)) groups.set(key, { key, assignee: row.assignee || UNASSIGNED, unassigned: !row.assignee, contacts: [] });
         groups.get(key).contacts.push(row);
       }
       // Keep first-seen order, but always list unassigned contacts last.
@@ -439,7 +471,11 @@
 
     const checkIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg>';
 
+    const chevIcon = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>';
+
     let currentGroups = [];
+    // Expanded groups, by assignee key, so they stay open while editing.
+    const openGroups = new Set();
 
     // Well-separated hues so neighbouring assignee groups are easy to tell apart.
     const GROUP_HUES = [155, 215, 280, 25, 330, 190, 45, 250];
@@ -492,18 +528,46 @@
         preview.innerHTML = '<div class="empty">Contacts will appear here, grouped by assignee.<br>Paste name, number and assignee columns to get started.</div>';
         return;
       }
-      preview.innerHTML = currentGroups.map((group, groupIndex) => `
-        <section class="group${group.unassigned ? " unassigned" : ""}" style="--hue: ${GROUP_HUES[groupIndex % GROUP_HUES.length]}">
+      $("groupTools").hidden = files < 2;
+      groupSearch.hidden = files <= 6;
+      preview.innerHTML = currentGroups.map((group, groupIndex) => {
+        const open = files === 1 || openGroups.has(group.key);
+        return `
+        <section class="group${group.unassigned ? " unassigned" : ""}${open ? " open" : ""}" data-key="${escapeHtml(group.key)}" style="--hue: ${GROUP_HUES[groupIndex % GROUP_HUES.length]}">
           <div class="group-head">
-            <div class="group-avatar">${escapeHtml(initials(group.assignee))}</div>
-            <div class="group-info">
-              <div class="group-name">${escapeHtml(group.assignee)} · ${plural(group.contacts.length, "contact")}</div>
-              <div class="group-file">${escapeHtml(fileNameFor(group))}</div>
-            </div>
+            <button class="group-toggle" type="button" aria-expanded="${open}">
+              ${chevIcon}
+              <span class="group-avatar">${escapeHtml(initials(group.assignee))}</span>
+              <span class="group-info"><span class="group-name">${escapeHtml(group.assignee)}</span><span class="group-count">${group.contacts.length}</span></span>
+            </button>
             <button class="group-btn" type="button" data-group="${groupIndex}" aria-label="Download ${escapeHtml(fileNameFor(group))}">${downloadIcon}<span class="btn-label">.vcf</span></button>
           </div>
-          <div class="contacts">${group.contacts.map(renderContact).join("")}</div>
-        </section>`).join("");
+          <div class="group-body">
+            <div class="group-file">${escapeHtml(fileNameFor(group))}</div>
+            <div class="contacts">${group.contacts.map(renderContact).join("")}</div>
+          </div>
+        </section>`;
+      }).join("");
+      updateToggleAll();
+      applySearch();
+    }
+
+    function setOpen(section, open) {
+      section.classList.toggle("open", open);
+      section.querySelector(".group-toggle").setAttribute("aria-expanded", open);
+      if (open) openGroups.add(section.dataset.key); else openGroups.delete(section.dataset.key);
+    }
+
+    function updateToggleAll() {
+      const allOpen = currentGroups.length > 0 && currentGroups.every(group => openGroups.has(group.key));
+      toggleAllBtn.textContent = allOpen ? "Collapse all" : "Expand all";
+    }
+
+    function applySearch() {
+      const query = groupSearch.hidden ? "" : groupSearch.value.trim().toLowerCase();
+      preview.querySelectorAll(".group").forEach(section => {
+        section.hidden = Boolean(query) && !section.querySelector(".group-name").textContent.toLowerCase().includes(query);
+      });
     }
 
     function vcardEscape(value) {
@@ -555,6 +619,13 @@
     }
 
     preview.addEventListener("click", (event) => {
+      const toggle = event.target.closest(".group-toggle");
+      if (toggle) {
+        const section = toggle.closest(".group");
+        setOpen(section, !section.classList.contains("open"));
+        updateToggleAll();
+        return;
+      }
       const button = event.target.closest(".group-btn");
       if (!button) return;
       const group = currentGroups[Number(button.dataset.group)];
@@ -563,6 +634,12 @@
       message.textContent = `Saved ${fileNameFor(group)}`;
     });
     [input, groupLabel, startAt, filename, addSequence, keepOriginal].forEach(el => el.addEventListener("input", render));
+    groupSearch.addEventListener("input", applySearch);
+    toggleAllBtn.addEventListener("click", () => {
+      const open = toggleAllBtn.textContent === "Expand all";
+      preview.querySelectorAll(".group").forEach(section => setOpen(section, open));
+      updateToggleAll();
+    });
     $("clearBtn").addEventListener("click", () => { input.value = ""; render(); input.focus(); });
     $("downloadAllBtn").addEventListener("click", downloadAll);
     render();
